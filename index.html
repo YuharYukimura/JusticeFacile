@@ -205,41 +205,7 @@ color:#64748b;
 JusticeFacile © 2026
 </footer>
 
-<script>
-const form=document.getElementById('legalForm');
-const inputs=form.querySelectorAll('input, textarea, select');
-const bar=document.getElementById('bar');
-
-function updateProgress(){
-let total=0,filled=0;
-inputs.forEach(i=>{
-if(i.type!=='file'){
-total++;
-if((i.type==='checkbox'&&i.checked)||(i.type!=='checkbox'&&i.value.trim()!=='')) filled++;
-}
-});
-bar.style.width=(filled/total*100)+'%';
-}
-
-inputs.forEach(i=>{
-i.addEventListener('input',updateProgress);
-i.addEventListener('change',updateProgress);
-});
-
-form.addEventListener('submit',e=>{
-e.preventDefault();
-
-document.getElementById('loader').style.display='block';
-
-setTimeout(()=>{
-document.getElementById('loader').style.display='none';
-document.getElementById('success').style.display='block';
-document.getElementById('jsonOutput').textContent='Données collectées avec succès.';
-},1800);
-});
-
-updateProgress();
-</script>
+<script> const form = document.getElementById('legalForm'); const inputs = form.querySelectorAll('input, textarea, select'); const bar = document.getElementById('bar'); function updateProgress() { let total = 0; let filled = 0; inputs.forEach(i => { if (i.type !== 'file') { total++; if ( (i.type === 'checkbox' && i.checked) || (i.type !== 'checkbox' && i.value.trim() !== '') ) { filled++; } } }); bar.style.width = (filled / total * 100) + '%'; } inputs.forEach(i => { i.addEventListener('input', updateProgress); i.addEventListener('change', updateProgress); }); form.addEventListener('submit', async (e) => { e.preventDefault(); document.getElementById('loader').style.display = 'block'; try { const data = {}; let compteur = 1; inputs.forEach(i => { if (i.type === 'file') return; if (i.type === 'checkbox') { data["champ_" + compteur] = i.checked; } else { data["champ_" + compteur] = i.value; } compteur++; }); const response = await fetch( "/.netlify/functions/analyse", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) } ); const resultat = await response.json(); document.getElementById('loader').style.display = 'none'; document.getElementById('success').style.display = 'block'; document.getElementById('jsonOutput').textContent = JSON.stringify(resultat, null, 2); } catch (err) { document.getElementById('loader').style.display = 'none'; document.getElementById('jsonOutput').textContent = "Erreur : " + err.message; document.getElementById('success').style.display = 'block'; } }); updateProgress(); </script>
 
 </body>
 </html>
